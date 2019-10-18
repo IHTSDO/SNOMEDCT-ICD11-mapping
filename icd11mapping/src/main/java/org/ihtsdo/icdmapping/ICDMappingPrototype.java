@@ -88,13 +88,13 @@ public class ICDMappingPrototype {
 	}
 
 	// Files
-	private final String SCTRF2_Con_File = "files/sct2_Concept_Snapshot_AU1000036_20190731.txt";
-	private final String SCTRF2_Desc_File = "files/sct2_Description_Snapshot-en-AU_AU1000036_20190731.txt";
-	private final String SCTTranstiveClosure_File = "files/tc-full.txt";
-	private final String ICD_File = "files/ICD_exclude_x_26.txt";
-	private final String GB_File = "files/der2_cRefset_LanguageSnapshot-en_INT_20190731.txt";
-	private final String mapSIFile = "files/der2_iisssccRefset_ExtendedMapFull_INT_20190731.txt";
-	private final String map11To10File = "files/11To10MapToOneCategory.xlsx";
+	private final String SCTRF2_Con_File = "sct2_Concept_Snapshot_AU1000036_20190731.txt";
+	private final String SCTRF2_Desc_File = "sct2_Description_Snapshot-en-AU_AU1000036_20190731.txt";
+	private final String SCTTranstiveClosure_File = "tc-full.txt";
+	private final String ICD_File = "ICD_exclude_x_26.txt";
+	private final String GB_File = "der2_cRefset_LanguageSnapshot-en_INT_20190731.txt";
+	private final String mapSIFile = "der2_iisssccRefset_ExtendedMapFull_INT_20190731.txt";
+	private final String map11To10File = "11To10MapToOneCategory.xlsx";
 
 	private static Logger logger = Logger.getLogger(ICDMappingPrototype.class.getName());
 
@@ -129,8 +129,8 @@ public class ICDMappingPrototype {
 
 	private static double SCALE_FACTOR = 0.9;
 
-	public void loadRF2SCTFiles() throws IOException {
-		File SCTConRf2File = getFileFromResources(SCTRF2_Con_File);
+	public void loadRF2SCTFiles(String resourceFileFolder) throws IOException {
+		File SCTConRf2File = new File(resourceFileFolder + "/" +  SCTRF2_Con_File);
 		List<String> contents = FileUtils.readLines(SCTConRf2File);
 		contents.remove(0);
 		for (String s : contents) {
@@ -144,7 +144,7 @@ public class ICDMappingPrototype {
 		}
 		logger.info("Total SCT concepts (include inactive) loaded " + SCTConceptsAll.size());
 
-		File gbFile = getFileFromResources(GB_File);
+		File gbFile = new File(resourceFileFolder + "/" + GB_File);
 		for (String s : FileUtils.readLines(gbFile)) {
 			String[] chunks = s.split("\\t");
 			String did = chunks[5].trim();
@@ -156,7 +156,7 @@ public class ICDMappingPrototype {
 
 		logger.info("GB English Set loaded " + gbEnglishSet.size());
 
-		File SCTDescRf2File = getFileFromResources(SCTRF2_Desc_File);
+		File SCTDescRf2File = new File(resourceFileFolder + "/" + SCTRF2_Desc_File);
 		contents = FileUtils.readLines(SCTDescRf2File);
 		contents.remove(0);
 		for (String s : contents) {
@@ -176,19 +176,6 @@ public class ICDMappingPrototype {
 		logger.info("Total SCT concepts FSN " + SCTConceptFSN.size());
 		logger.info("Total SCT descriptions " + SCTConceptDescription.size());
 
-		File SCTTCFile = getFileFromResources(SCTTranstiveClosure_File);
-		contents = FileUtils.readLines(SCTTCFile);
-		for (String s : contents) {
-			String[] parts = s.split("[\\t]");
-			String id = parts[0];
-			if (!SCTTC.containsKey(id)) {
-				SCTTC.put(id, new HashSet<String>());
-			}
-			SCTTC.get(id).add(parts[1]);
-
-		}
-		logger.info("Total SCT TC " + SCTTC.size());
-
 	}
 
 	public void loadMappingSource(String inputFile) throws IOException {
@@ -201,9 +188,9 @@ public class ICDMappingPrototype {
 		logger.info("Total SCT Concepts loaded as mapping source " + mappingSourceSet.size());
 	}
 
-	private void loadICD11() throws IOException {
+	private void loadICD11(String resourceFileFolder) throws IOException {
 		try {
-			File icdFile = getFileFromResources(ICD_File);
+			File icdFile = new File(resourceFileFolder + "/" + ICD_File);
 			for (String s : FileUtils.readLines(icdFile)) {
 				String[] chunks = seperateTab(s);
 				ICD11Code icdCode = new ICD11Code();
@@ -222,9 +209,9 @@ public class ICDMappingPrototype {
 		logger.info("Load ICD 11 " + icd11.size());
 	}
 	
-	private void loadTC() throws IOException {
+	private void loadTC(String resourceFileFolder) throws IOException {
 		try {
-			File tcFile = getFileFromResources(SCTTranstiveClosure_File);
+			File tcFile =new File(resourceFileFolder + "/" + SCTTranstiveClosure_File);
 			for (String s : FileUtils.readLines(tcFile)) {
 				String[] chunks = seperateTab(s);
 				String cid =  chunks[0];
@@ -241,11 +228,11 @@ public class ICDMappingPrototype {
 		logger.info("Load TC Table " + concept_ancestor.size());
 	}
 	
-	private void loadMapping() {
+	private void loadMapping(String resourceFileFolder) {
 		
 		try {
 			
-			for (String s : FileUtils.readLines(getFileFromResources(mapSIFile))) {
+			for (String s : FileUtils.readLines(new File(resourceFileFolder + "/" +mapSIFile))) {
 				String[] parts = seperateTab(s);
 				if(parts[2].equals("1")&&parts[6].equals("1")&&parts[7].equals("1")&& parts[8].trim().equalsIgnoreCase("TRUE")
 						&& seperateWhiteSpace(parts[9])[0].equalsIgnoreCase("ALWAYS") && parts[12].trim().equalsIgnoreCase("447637006")) {
@@ -270,7 +257,7 @@ public class ICDMappingPrototype {
 			logger.info("Load SI MAP " + siMap.size());
 			
 
-			File icd11to10MapFile = getFileFromResources(map11To10File);
+			File icd11to10MapFile = new File(resourceFileFolder + "/" + map11To10File);
 			for(List<String> line : readXLSXFile(icd11to10MapFile, "11To10MapToOneCategory", false)) {
 				String icd10Code = line.get(4).trim();
 				String icdtitle = line.get(3).toLowerCase();
@@ -661,19 +648,19 @@ public class ICDMappingPrototype {
 		return list;
 	}
 
-	public void run(String inputFile, String outPutFile) {
+	public void run(String resouceFileFoler, String inputFile, String outPutFile) {
 
 		logger.info("Output file is : " + outPutFile);
 
 		try {
 			logger.info("Load SCT");
-			loadRF2SCTFiles();
+			loadRF2SCTFiles(resouceFileFoler);
 			logger.info("Load ICD");
-			loadICD11();
+			loadICD11(resouceFileFoler);
 			logger.info("Load Mapping");
-			loadMapping();
+			loadMapping(resouceFileFoler);
 			logger.info("Load TC");
-			loadTC();
+			loadTC(resouceFileFoler);
 			logger.info("Load Mapping Source");
 			loadMappingSource(inputFile);
 			logger.info("Run Mapping");
@@ -688,6 +675,6 @@ public class ICDMappingPrototype {
 	public static void main(String[] args) {
 		ICDMappingPrototype icdMappingPrototype = new ICDMappingPrototype();
 		logger.info("ICD Mapping ProtoType");
-		icdMappingPrototype.run(args[0], args[1]);
+		icdMappingPrototype.run(args[0], args[1], args[2]);
 	}
 }
