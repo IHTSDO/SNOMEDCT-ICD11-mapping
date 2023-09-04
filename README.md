@@ -1,3 +1,5 @@
+## This repository is no longer maintained or used and has therefore been archived and made read-only. SNOMED International does not recommend using the code in this repository. ##
+
 # SNOMEDCT-ICD11-mapping
 This repository hosts coding approaches to generating parts of a map from SNOMED CT to ICD-11
 
